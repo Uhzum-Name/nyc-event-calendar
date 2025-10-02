@@ -1,5 +1,9 @@
 name: Update NYC Events Calendar
 
+# Grant the workflow permission to write to the repository (required for pushing updates)
+permissions:
+  contents: write
+
 on:
   # Run daily at 5 am New York time and allow manual runs.
   schedule:
