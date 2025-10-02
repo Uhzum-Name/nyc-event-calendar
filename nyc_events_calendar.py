@@ -146,7 +146,18 @@ def main() -> None:
     api_key = get_env_variable("NYC_API_KEY")
     categories = parse_comma_separated(os.getenv("CATEGORIES"))
     boroughs = parse_comma_separated(os.getenv("BOROUGHS"))
-    days_ahead = int(os.getenv("DAYS_AHEAD", "30"))
+    # Read the number of days ahead to query.  If the environment variable is set
+    # but empty, fallback to the default value (30).  This avoids errors when
+    # GitHub Actions injects an empty string for an undefined secret.
+    days_ahead_raw = os.getenv("DAYS_AHEAD", "30")
+    try:
+        days_ahead = int(days_ahead_raw) if days_ahead_raw else 30
+    except ValueError:
+        logging.warning(
+            "Invalid DAYS_AHEAD value %r; using default of 30 days.",
+            days_ahead_raw
+        )
+        days_ahead = 30
 
     start_date = datetime.now()
     end_date = start_date + timedelta(days=days_ahead)
