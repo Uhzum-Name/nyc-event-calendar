@@ -1,7 +1,7 @@
 name: Update NYC Events Calendar
 
 on:
-  # Run daily at 5 am New York time and allow manual runs.
+  # Run daily at 5 AM New York time and allow manual runs.
   schedule:
     - cron: '0 9 * * *'  # 9 UTC ≈ 5 AM America/New_York (adjust if needed)
   workflow_dispatch:
@@ -15,7 +15,7 @@ jobs:
       # Optional categories and boroughs; customise these in repository secrets or variables
       CATEGORIES: ${{ secrets.CATEGORIES }}
       BOROUGHS: ${{ secrets.BOROUGHS }}
-      DAYS_AHEAD: ${{ secrets.DAYS_AHEAD || '30' }}
+      DAYS_AHEAD: ${{ secrets.DAYS_AHEAD }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,3 +44,4 @@ jobs:
             git push
           else
             echo "No changes detected."
+          fi
