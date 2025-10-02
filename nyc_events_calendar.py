@@ -62,7 +62,7 @@ def fetch_events(api_key: str,
                  end_date: datetime,
                  categories: List[str],
                  boroughs: List[str],
-                 keywords: str = "free",
+                 keywords: str | None = None,
                  max_pages: int = 5) -> List[Dict[str, Any]]:
     """Call the NYC Events Calendar API and return a list of event objects.
 
@@ -75,17 +75,20 @@ def fetch_events(api_key: str,
     headers = {"Ocp-Apim-Subscription-Key": api_key}
 
     while page_number <= max_pages:
+        # Prepare query parameters.  Convert lists into comma‑separated strings as
+        # required by the API.  Only include keywords if provided.
         params = {
             "startDate": start_date.strftime("%m/%d/%Y %H:%M"),
             "endDate": end_date.strftime("%m/%d/%Y %H:%M"),
             "sort": "DATE",  # chronological order【699378210572664†screenshot】
-            "keywords": keywords,
             "pageNumber": page_number,
         }
         if categories:
-            params["categories"] = categories
+            params["categories"] = ",".join(categories)
         if boroughs:
-            params["boroughs"] = boroughs
+            params["boroughs"] = ",".join(boroughs)
+        if keywords:
+            params["keywords"] = keywords
 
         try:
             resp = requests.get(API_BASE_URL, params=params, headers=headers)
