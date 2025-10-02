@@ -1,5 +1,4 @@
 BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//NYC Events Calendar//EN
-CALSCALE:GREGORIAN
+PRODID:ics.py - http://git.io/lLljaA
 END:VCALENDAR
