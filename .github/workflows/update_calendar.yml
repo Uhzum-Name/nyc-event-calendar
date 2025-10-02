@@ -1,0 +1,46 @@
+name: Update NYC Events Calendar
+
+on:
+  # Run daily at 5 am New York time and allow manual runs.
+  schedule:
+    - cron: '0 9 * * *'  # 9 UTC ≈ 5 AM America/New_York (adjust if needed)
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # Pass secrets into the script
+      NYC_API_KEY: ${{ secrets.NYC_API_KEY }}
+      # Optional categories and boroughs; customise these in repository secrets or variables
+      CATEGORIES: ${{ secrets.CATEGORIES }}
+      BOROUGHS: ${{ secrets.BOROUGHS }}
+      DAYS_AHEAD: ${{ secrets.DAYS_AHEAD || '30' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests ics
+
+      - name: Run update script
+        run: |
+          python nyc_events_calendar.py
+
+      - name: Commit and push if calendar updated
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain nyc_events.ics)" ]; then
+            git add nyc_events.ics
+            git commit -m "Update NYC events calendar" || echo "No changes to commit"
+            git push
+          else
+            echo "No changes detected."
